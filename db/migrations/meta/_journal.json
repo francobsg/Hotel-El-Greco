@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792017983778,
+      "tag": "0000_esquema_inventario",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792018002703,
+      "tag": "0001_folios_guias",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792018806249,
+      "tag": "0002_sesiones_usuarios",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792020820130,
+      "tag": "0003_indices_panel",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792026503406,
+      "tag": "0004_ventas_provisionales",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792030461837,
+      "tag": "0005_indices_entrega",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792030821131,
+      "tag": "0006_acceso_exclusivo_servidor",
+      "breakpoints": true
+    }
+  ]
+}

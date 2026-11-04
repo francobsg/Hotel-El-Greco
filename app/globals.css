@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/poppins/latin-600.css";
+@import "@fontsource/poppins/latin-700.css";
+
+@theme {
+  --color-verde-900: #0f3d2e;
+  --color-verde-700: #14532d;
+  --color-dorado: #b8892b;
+  --color-crema: #f7f4ec;
+  --color-tarjeta: #ffffff;
+  --color-texto: #1f2d27;
+  --color-texto-secundario: #59685f;
+  --color-critico: #b91c1c;
+  --color-bajo: #b45309;
+  --color-normal: #15803d;
+  --font-titulo: "Poppins", sans-serif;
+  --font-texto: "Inter", sans-serif;
+  --radius-tarjeta: 12px;
+  --shadow-tarjeta: 0 4px 24px rgb(15 61 46 / 6%);
+}
+
+@media (max-width: 767px) {
+  button { min-height: 44px; min-width: 44px; }
+  input:not([type="checkbox"]):not([type="hidden"]), select, summary { min-height: 44px; }
+}
+
+@layer base {
+  body {
+    @apply bg-crema font-texto text-base text-texto antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-titulo font-semibold text-verde-900;
+  }
+
+  button:not(:disabled), a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-dorado;
+  }
+}
+
+@media print {
+  body { background: white; color: black; font-size: 12px; }
+  aside, header, .no-imprimir { display: none !important; }
+  .lg\:pl-64 { padding-left: 0 !important; }
+  #contenido-principal { padding: 0; max-width: none; }
+  [data-guia-imprimible] { box-shadow: none; }
+  [data-guia-imprimible] table { min-width: 0; font-size: 11px; }
+  [data-guia-imprimible] tr { break-inside: avoid; }
+}

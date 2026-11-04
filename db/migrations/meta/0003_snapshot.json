@@ -1,0 +1,1088 @@
+{
+  "id": "e5ea5740-b12c-454d-bf90-5e4967103f3c",
+  "prevId": "d1069423-7fba-4477-976c-40ec02966c51",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.bodegas": {
+      "name": "bodegas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "bodegas_nombre_unique": {
+          "name": "bodegas_nombre_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nombre"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "bodegas_dos_bodegas": {
+          "name": "bodegas_dos_bodegas",
+          "value": "\"bodegas\".\"id\" in (1, 2)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.categorias": {
+      "name": "categorias",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "grupo_grafico": {
+          "name": "grupo_grafico",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "categorias_nombre_unique": {
+          "name": "categorias_nombre_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nombre"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.guia_items": {
+      "name": "guia_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "guia_id": {
+          "name": "guia_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "producto_id": {
+          "name": "producto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marca": {
+          "name": "marca",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "guia_items_guia_idx": {
+          "name": "guia_items_guia_idx",
+          "columns": [
+            {
+              "expression": "guia_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "guia_items_guia_id_guias_id_fk": {
+          "name": "guia_items_guia_id_guias_id_fk",
+          "tableFrom": "guia_items",
+          "tableTo": "guias",
+          "columnsFrom": [
+            "guia_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "guia_items_producto_id_productos_id_fk": {
+          "name": "guia_items_producto_id_productos_id_fk",
+          "tableFrom": "guia_items",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "producto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "guia_items_cantidad_positiva": {
+          "name": "guia_items_cantidad_positiva",
+          "value": "\"guia_items\".\"cantidad\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.guias": {
+      "name": "guias",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "folio": {
+          "name": "folio",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "tipo_guia",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bodega_origen_id": {
+          "name": "bodega_origen_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bodega_destino_id": {
+          "name": "bodega_destino_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "n_factura": {
+          "name": "n_factura",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "glosa": {
+          "name": "glosa",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imagen_factura_url": {
+          "name": "imagen_factura_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creado_en": {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "guias_fecha_idx": {
+          "name": "guias_fecha_idx",
+          "columns": [
+            {
+              "expression": "fecha",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "guias_bodega_origen_id_bodegas_id_fk": {
+          "name": "guias_bodega_origen_id_bodegas_id_fk",
+          "tableFrom": "guias",
+          "tableTo": "bodegas",
+          "columnsFrom": [
+            "bodega_origen_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "guias_bodega_destino_id_bodegas_id_fk": {
+          "name": "guias_bodega_destino_id_bodegas_id_fk",
+          "tableFrom": "guias",
+          "tableTo": "bodegas",
+          "columnsFrom": [
+            "bodega_destino_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "guias_usuario_id_usuarios_id_fk": {
+          "name": "guias_usuario_id_usuarios_id_fk",
+          "tableFrom": "guias",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "guias_folio_unique": {
+          "name": "guias_folio_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "folio"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "guias_bodegas_segun_tipo": {
+          "name": "guias_bodegas_segun_tipo",
+          "value": "\n    (\"guias\".\"tipo\" in ('entrada', 'ajuste_positivo') and \"guias\".\"bodega_origen_id\" is null and \"guias\".\"bodega_destino_id\" is not null)\n    or (\"guias\".\"tipo\" in ('salida', 'consumo', 'ajuste_negativo', 'venta') and \"guias\".\"bodega_origen_id\" is not null and \"guias\".\"bodega_destino_id\" is null)\n    or (\"guias\".\"tipo\" = 'traspaso' and \"guias\".\"bodega_origen_id\" is not null and \"guias\".\"bodega_destino_id\" is not null and \"guias\".\"bodega_origen_id\" = 1 and \"guias\".\"bodega_destino_id\" = 2)"
+        },
+        "guias_entrada_principal_factura": {
+          "name": "guias_entrada_principal_factura",
+          "value": "\"guias\".\"tipo\" <> 'entrada' or (\"guias\".\"bodega_destino_id\" = 1 and \"guias\".\"n_factura\" is not null and length(trim(\"guias\".\"n_factura\")) > 0)"
+        },
+        "guias_caja_en_cocina": {
+          "name": "guias_caja_en_cocina",
+          "value": "\"guias\".\"tipo\" not in ('consumo', 'venta') or \"guias\".\"bodega_origen_id\" = 2"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.movimientos": {
+      "name": "movimientos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "guia_id": {
+          "name": "guia_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "producto_id": {
+          "name": "producto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bodega_id": {
+          "name": "bodega_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "creado_en": {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "movimientos_producto_bodega_fecha_idx": {
+          "name": "movimientos_producto_bodega_fecha_idx",
+          "columns": [
+            {
+              "expression": "producto_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bodega_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "fecha",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "movimientos_guia_idx": {
+          "name": "movimientos_guia_idx",
+          "columns": [
+            {
+              "expression": "guia_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "movimientos_bodega_fecha_idx": {
+          "name": "movimientos_bodega_fecha_idx",
+          "columns": [
+            {
+              "expression": "bodega_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "fecha",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "movimientos_fecha_id_idx": {
+          "name": "movimientos_fecha_id_idx",
+          "columns": [
+            {
+              "expression": "fecha",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "movimientos_guia_id_guias_id_fk": {
+          "name": "movimientos_guia_id_guias_id_fk",
+          "tableFrom": "movimientos",
+          "tableTo": "guias",
+          "columnsFrom": [
+            "guia_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "movimientos_producto_id_productos_id_fk": {
+          "name": "movimientos_producto_id_productos_id_fk",
+          "tableFrom": "movimientos",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "producto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "movimientos_bodega_id_bodegas_id_fk": {
+          "name": "movimientos_bodega_id_bodegas_id_fk",
+          "tableFrom": "movimientos",
+          "tableTo": "bodegas",
+          "columnsFrom": [
+            "bodega_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "movimientos_cantidad_no_cero": {
+          "name": "movimientos_cantidad_no_cero",
+          "value": "\"movimientos\".\"cantidad\" <> 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.platillos": {
+      "name": "platillos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "precio": {
+          "name": "precio",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "name": "activo",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "platillos_nombre_unique": {
+          "name": "platillos_nombre_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "nombre"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "platillos_precio_no_negativo": {
+          "name": "platillos_precio_no_negativo",
+          "value": "\"platillos\".\"precio\" is null or \"platillos\".\"precio\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.productos": {
+      "name": "productos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "categoria_id": {
+          "name": "categoria_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unidad": {
+          "name": "unidad",
+          "type": "unidad_producto",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "marca": {
+          "name": "marca",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stock_critico": {
+          "name": "stock_critico",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "stock_minimo": {
+          "name": "stock_minimo",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "stock_maximo": {
+          "name": "stock_maximo",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "costo": {
+          "name": "costo",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        }
+      },
+      "indexes": {
+        "productos_categoria_idx": {
+          "name": "productos_categoria_idx",
+          "columns": [
+            {
+              "expression": "categoria_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "productos_categoria_id_categorias_id_fk": {
+          "name": "productos_categoria_id_categorias_id_fk",
+          "tableFrom": "productos",
+          "tableTo": "categorias",
+          "columnsFrom": [
+            "categoria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "productos_umbrales_validos": {
+          "name": "productos_umbrales_validos",
+          "value": "0 <= \"productos\".\"stock_critico\" and \"productos\".\"stock_critico\" <= \"productos\".\"stock_minimo\" and \"productos\".\"stock_minimo\" <= \"productos\".\"stock_maximo\""
+        },
+        "productos_costo_no_negativo": {
+          "name": "productos_costo_no_negativo",
+          "value": "\"productos\".\"costo\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.recetas": {
+      "name": "recetas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "platillo_id": {
+          "name": "platillo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "producto_id": {
+          "name": "producto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gramos_o_ml": {
+          "name": "gramos_o_ml",
+          "type": "numeric(12, 3)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "recetas_platillo_id_platillos_id_fk": {
+          "name": "recetas_platillo_id_platillos_id_fk",
+          "tableFrom": "recetas",
+          "tableTo": "platillos",
+          "columnsFrom": [
+            "platillo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "recetas_producto_id_productos_id_fk": {
+          "name": "recetas_producto_id_productos_id_fk",
+          "tableFrom": "recetas",
+          "tableTo": "productos",
+          "columnsFrom": [
+            "producto_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "recetas_platillo_producto_unico": {
+          "name": "recetas_platillo_producto_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "platillo_id",
+            "producto_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "recetas_cantidad_positiva": {
+          "name": "recetas_cantidad_positiva",
+          "value": "\"recetas\".\"gramos_o_ml\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.usuarios": {
+      "name": "usuarios",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(254)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rol": {
+          "name": "rol",
+          "type": "rol_usuario",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "activo": {
+          "name": "activo",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "version_sesion": {
+          "name": "version_sesion",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "creado_en": {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "usuarios_email_unique": {
+          "name": "usuarios_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ventas_diarias": {
+      "name": "ventas_diarias",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "archivo_url": {
+          "name": "archivo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "total_platos": {
+          "name": "total_platos",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "procesado_en": {
+          "name": "procesado_en",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ventas_diarias_usuario_id_usuarios_id_fk": {
+          "name": "ventas_diarias_usuario_id_usuarios_id_fk",
+          "tableFrom": "ventas_diarias",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ventas_diarias_fecha_unique": {
+          "name": "ventas_diarias_fecha_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "fecha"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ventas_diarias_total_no_negativo": {
+          "name": "ventas_diarias_total_no_negativo",
+          "value": "\"ventas_diarias\".\"total_platos\" >= 0"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ventas_diarias_items": {
+      "name": "ventas_diarias_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "venta_diaria_id": {
+          "name": "venta_diaria_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "platillo_id": {
+          "name": "platillo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ventas_diarias_items_venta_diaria_id_ventas_diarias_id_fk": {
+          "name": "ventas_diarias_items_venta_diaria_id_ventas_diarias_id_fk",
+          "tableFrom": "ventas_diarias_items",
+          "tableTo": "ventas_diarias",
+          "columnsFrom": [
+            "venta_diaria_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "ventas_diarias_items_platillo_id_platillos_id_fk": {
+          "name": "ventas_diarias_items_platillo_id_platillos_id_fk",
+          "tableFrom": "ventas_diarias_items",
+          "tableTo": "platillos",
+          "columnsFrom": [
+            "platillo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ventas_diarias_items_platillo_unico": {
+          "name": "ventas_diarias_items_platillo_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "venta_diaria_id",
+            "platillo_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ventas_diarias_items_cantidad_positiva": {
+          "name": "ventas_diarias_items_cantidad_positiva",
+          "value": "\"ventas_diarias_items\".\"cantidad\" > 0"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.rol_usuario": {
+      "name": "rol_usuario",
+      "schema": "public",
+      "values": [
+        "superadmin",
+        "admin",
+        "trabajador"
+      ]
+    },
+    "public.tipo_guia": {
+      "name": "tipo_guia",
+      "schema": "public",
+      "values": [
+        "entrada",
+        "salida",
+        "traspaso",
+        "consumo",
+        "ajuste_positivo",
+        "ajuste_negativo",
+        "venta"
+      ]
+    },
+    "public.unidad_producto": {
+      "name": "unidad_producto",
+      "schema": "public",
+      "values": [
+        "kg",
+        "lt",
+        "un",
+        "caja"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {
+    "public.folios_bodega_1": {
+      "name": "folios_bodega_1",
+      "schema": "public",
+      "increment": "1",
+      "startWith": "1",
+      "minValue": "1",
+      "maxValue": "999999",
+      "cache": "1",
+      "cycle": false
+    },
+    "public.folios_bodega_2": {
+      "name": "folios_bodega_2",
+      "schema": "public",
+      "increment": "1",
+      "startWith": "1",
+      "minValue": "1",
+      "maxValue": "999999",
+      "cache": "1",
+      "cycle": false
+    }
+  },
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.stock_actual": {
+      "columns": {
+        "producto_id": {
+          "name": "producto_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bodega_id": {
+          "name": "bodega_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cantidad": {
+          "name": "cantidad",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "definition": "select producto_id, bodega_id, sum(cantidad) as cantidad from movimientos group by producto_id, bodega_id",
+      "name": "stock_actual",
+      "schema": "public",
+      "isExisting": false,
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
