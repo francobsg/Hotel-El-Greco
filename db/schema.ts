@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, date, index, integer, numeric, pgEnum, pgSequence, pgTable, pgView, primaryKey, serial, text, timestamp, unique, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
+import { boolean, check, date, index, integer, numeric, pgEnum, pgSequence, pgTable, pgView, serial, text, timestamp, unique, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const rol_usuario = pgEnum("rol_usuario", ["superadmin", "admin", "trabajador"]);
 export const unidad_producto = pgEnum("unidad_producto", ["kg", "lt", "un", "caja"]);
@@ -44,12 +44,6 @@ export const productos = pgTable("productos", {
   check("productos_umbrales_validos", sql`0 <= ${tabla.stock_critico} and ${tabla.stock_critico} <= ${tabla.stock_minimo} and ${tabla.stock_minimo} <= ${tabla.stock_maximo}`),
   check("productos_costo_no_negativo", sql`${tabla.costo} >= 0`),
 ]).enableRLS();
-
-export const estado_alertas_stock = pgTable("estado_alertas_stock", {
-  producto_id: integer("producto_id").notNull().references(() => productos.id, { onDelete: "cascade" }),
-  bodega_id: integer("bodega_id").notNull().references(() => bodegas.id, { onDelete: "cascade" }),
-  ignorada_hasta: timestamp("ignorada_hasta", { withTimezone: true }),
-}, (tabla) => [primaryKey({ columns: [tabla.producto_id, tabla.bodega_id] })]).enableRLS();
 
 export const guias = pgTable("guias", {
   id: serial("id").primaryKey(),

@@ -2,14 +2,13 @@
 
 ## Inicio
 
-1. Instalar Node.js 24 LTS, disponer de un servidor PostgreSQL y descomprimir el código.
+1. Instalar Node.js 24 LTS y descomprimir el código.
 2. Ejecutar `npm ci` en la carpeta que contiene `package.json`.
-3. Crear una base vacía en PostgreSQL y configurar `.env.local` con su `DATABASE_URL`, `AUTH_SECRET` y `SEED_PASSWORD`.
-4. Ejecutar `npm run db:seed` una vez para cargar datos de demostración en la base vacía. Este paso es opcional.
-5. Ejecutar `npm run dev`. Las migraciones se aplican automáticamente antes de iniciar la web.
-6. Abrir http://127.0.0.1:3000/login e ingresar con la cuenta principal de prueba si se cargó el seed.
+3. Si se entregó un TXT privado de acceso, seguir sus instrucciones para configurar la contraseña inicial. En caso contrario, `npm run db:local` genera una aleatoria y la guarda en `.env.local`.
+4. Mantener `npm run db:local` abierto e iniciar `npm run dev -- --hostname 127.0.0.1` en otra terminal.
+5. Abrir http://127.0.0.1:3000/login e ingresar con la cuenta principal de prueba.
 
-El código fuente contiene el esquema y las migraciones, no una base PostgreSQL ni credenciales. PostgreSQL conserva los datos en el servidor configurado. No ejecutes el seed sobre una base con datos reales.
+El código fuente no contiene una base personal, contraseñas ni claves de servicios. La base de demostración se crea en la máquina del evaluador y conserva sus datos al reiniciar. Si ya hay otra base local usando el puerto 55432, detenerla antes de iniciar esta copia.
 
 ## Recorrido funcional
 

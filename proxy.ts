@@ -14,8 +14,7 @@ export async function proxy(request: NextRequest) {
   if (!sesion) return es_api ? NextResponse.json({ error: "Inicia sesion para continuar." }, { status: 401 }) : NextResponse.redirect(new URL("/login", request.url));
   const es_logout = ruta === "/api/auth/logout";
   const escribe = !["GET", "HEAD", "OPTIONS"].includes(request.method);
-  const puede_ignorar_alerta = sesion.rol === "admin" && ruta === "/api/alertas" && request.method === "PATCH";
-  if (escribe && !es_logout && !puede_ignorar_alerta && !mutacion_permitida(sesion.rol)) return NextResponse.json({ error: "El administrador tiene acceso de solo lectura." }, { status: 403 });
+  if (escribe && !es_logout && !mutacion_permitida(sesion.rol)) return NextResponse.json({ error: "El administrador tiene acceso de solo lectura." }, { status: 403 });
   if (!es_logout && !ruta_permitida(sesion.rol, ruta)) return es_api ? NextResponse.json({ error: "Acceso no permitido." }, { status: 403 }) : NextResponse.redirect(new URL(ruta_inicial(sesion.rol, sesion.movil), request.url));
   return NextResponse.next();
 }

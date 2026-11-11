@@ -1,1 +1,0 @@
-ALTER TABLE "estado_alertas_stock" DROP COLUMN "resuelta";
