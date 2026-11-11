@@ -6,6 +6,8 @@ export type FiltrosPanel = { fecha: string; dias: 7 | 30 | 90; bodega: 1 | 2 | n
 export type ResumenPanel = {
   kpis: { productos: number; alertas: number; movimientos: number; usuarios: number };
   total_alertas: number;
+  pagina_alertas: number;
+  paginas_alertas: number;
   movimientos: { id: number; producto: string; bodega: string; tipo: string; cantidad: string; unidad: UnidadStock; fecha: string }[];
   alertas: { producto_id: number; bodega_id: number; producto: string; bodega: string; cantidad: string; unidad: UnidadStock; estado: "bajo" | "critico" }[];
 };

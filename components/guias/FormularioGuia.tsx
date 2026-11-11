@@ -10,7 +10,7 @@ import { ItemGuia, type ItemFormulario } from "./ItemGuia";
 import { ReciboGuia } from "./ReciboGuia";
 import Link from "next/link";
 import { comprimir_factura } from "@/lib/escaner/comprimir";
-export type InicialGuia = { fecha?: string; n_factura?: string; proveedor?: string; items: ItemFormulario[] };
+export type InicialGuia = { fecha?: string; n_factura?: string; proveedor?: string; bodega_ajuste?: 1 | 2; items: ItemFormulario[] };
 const campo = "mt-1 block w-full min-w-0 rounded-lg border border-verde-900/15 bg-white px-3 py-2.5 text-sm";
 const item_vacio = (clave: number): ItemFormulario => ({ clave, producto_id: 0, cantidad: "", marca: "", descripcion: "" });
 export function FormularioGuia({ tipo_inicial, superadmin, inicial, escaneo, al_reiniciar, al_guardada, al_enviando }: { tipo_inicial: typeof tipos_guia[number]; superadmin: boolean; inicial?: InicialGuia; escaneo?: { token: string; categorias: { id: number; nombre: string }[] }; al_reiniciar?: () => void; al_guardada?: () => void; al_enviando?: (enviando: boolean) => void }) {
@@ -20,7 +20,7 @@ export function FormularioGuia({ tipo_inicial, superadmin, inicial, escaneo, al_
   const [proveedor, set_proveedor] = useState(inicial?.proveedor ?? "");
   const [confirmado, set_confirmado] = useState(false);
   const [glosa, set_glosa] = useState("");
-  const [bodega, set_bodega] = useState<1 | 2>(1);
+  const [bodega, set_bodega] = useState<1 | 2>(inicial?.bodega_ajuste ?? 1);
   const [items, set_items] = useState<ItemFormulario[]>(inicial?.items.length ? inicial.items : [item_vacio(1)]);
   const siguiente = useRef((inicial?.items.length ?? 1) + 1);
   const archivo = useRef<HTMLInputElement>(null);

@@ -10,6 +10,7 @@ import { afterAll, beforeAll, beforeEach, expect, it } from "vitest";
 
 import * as esquema from "@/db/schema";
 import { crear_servicio_stats } from "@/lib/stats";
+import { crear_servicio_alertas } from "@/lib/stats/alertas";
 import { crear_servicio_stock } from "@/lib/stock/servicio";
 import { type FiltrosPanel, leer_filtros } from "@/lib/stats/tipos";
 
@@ -90,6 +91,25 @@ it("KPI cuenta productos distintos; alertas incluyen stock cero y distinguen umb
   expect((await stats.resumen_panel({ ...filtros, bodega: 2 })).kpis.alertas).toBe(0);
 });
 
+it("pagina las alertas de stock en grupos de cinco y limita la ultima pagina", async () => {
+  await db.insert(esquema.productos).values(Array.from({ length: 5 }, (_, indice) => ({
+    nombre: `Producto bajo ${indice + 1}`,
+    categoria_id,
+    unidad: "kg" as const,
+    stock_critico: "1",
+    stock_minimo: "5",
+    stock_maximo: "100",
+  })));
+  const paginas = await Promise.all([1, 2, 3].map((pagina) => stats.resumen_panel(filtros, pagina)));
+  expect(paginas.map((pagina) => pagina.alertas.length)).toEqual([5, 5, 2]);
+  expect(paginas.map((pagina) => pagina.pagina_alertas)).toEqual([1, 2, 3]);
+  expect(paginas.map((pagina) => pagina.paginas_alertas)).toEqual([3, 3, 3]);
+  expect(paginas.every((pagina) => pagina.total_alertas === 12)).toBe(true);
+  expect(new Set(paginas.flatMap((pagina) => pagina.alertas.map((alerta) => `${alerta.producto_id}_${alerta.bodega_id}`))).size).toBe(12);
+  expect(await stats.resumen_panel(filtros, 99)).toMatchObject({ pagina_alertas: 3, alertas: paginas[2].alertas });
+  await expect(stats.resumen_panel(filtros, 0)).rejects.toThrow("entero positivo");
+});
+
 it("movimientos: devuelve los cinco mas recientes por fecha/id y respeta bodega/corte", async () => {
   for (let dia = 1; dia <= 7; dia++) await ajuste(`2026-10-0${dia}`, "1");
   await ajuste("2026-10-15", "1");
@@ -114,8 +134,26 @@ it("base vacia: ceros y estados vacios; valida parametros", async () => {
   expect(indices.rows.map((indice) => indice.indexname)).toContain("movimientos_bodega_fecha_idx");
 });
 
+it("ignora una alerta por siete dias y permite la accion limitada al administrador", async () => {
+  await ajuste("2026-10-14", "10", true, 1);
+  await ajuste("2026-10-14", "2");
+  const actor = { id: usuario_id, nombre: "Prueba", email: "prueba@test.cl", rol: "superadmin" as const, version_sesion: 0, movil: false };
+  const servicio = crear_servicio_alertas(db);
+  const alerta = { producto_id, bodega_id: 2 };
+
+  expect((await stats.resumen_panel(filtros)).alertas.some((fila) => fila.producto_id === producto_id && fila.bodega_id === 2)).toBe(true);
+  await servicio.actualizar(actor, { ...alerta, accion: "ignorar" });
+  expect((await stats.resumen_panel(filtros)).alertas.some((fila) => fila.producto_id === producto_id && fila.bodega_id === 2)).toBe(false);
+
+  await db.update(esquema.estado_alertas_stock).set({ ignorada_hasta: new Date(Date.now() - 1000) });
+  expect((await stats.resumen_panel(filtros)).alertas.some((fila) => fila.producto_id === producto_id && fila.bodega_id === 2)).toBe(true);
+  const admin = { ...actor, id: usuario_id, rol: "admin" as const };
+  await servicio.actualizar(admin, { ...alerta, accion: "ignorar" });
+  expect((await stats.resumen_panel(filtros)).alertas.some((fila) => fila.producto_id === producto_id && fila.bodega_id === 2)).toBe(false);
+});
+
 it("driver postgres: ejecuta resumen e historico con los resultados reales del protocolo", async () => {
-  await ajuste("2026-10-14", "10");
+  await ajuste("2026-10-14", "2");
   const socket = new PGLiteSocketServer({ db: cliente, host: "127.0.0.1", port: 0, maxConnections: 20 });
   await socket.start();
   const conexion = postgres(`postgresql://postgres:prueba@${socket.getServerConn()}/postgres`, { prepare: false, max: 1 });
@@ -123,7 +161,10 @@ it("driver postgres: ejecuta resumen e historico con los resultados reales del p
     const servicio = crear_servicio_stats(drizzle_postgres(conexion, { schema: esquema }));
     const [resumen, graficos] = await Promise.all([servicio.resumen_panel(filtros), servicio.stock_historico(filtros)]);
     expect(resumen.kpis.productos).toBe(1);
-    expect(graficos[0].datos.at(-1)?.[graficos[0].series[0].clave]).toBe(10);
+    expect(graficos[0].datos.at(-1)?.[graficos[0].series[0].clave]).toBe(2);
+    const actor = { id: usuario_id, nombre: "Prueba", email: "prueba@test.cl", rol: "superadmin" as const, version_sesion: 0, movil: false };
+    await crear_servicio_alertas(drizzle_postgres(conexion, { schema: esquema })).actualizar(actor, { producto_id, bodega_id: 2, accion: "ignorar" });
+    expect((await servicio.resumen_panel(filtros)).alertas.some((fila) => fila.producto_id === producto_id && fila.bodega_id === 2)).toBe(false);
   } finally {
     await conexion.end();
     await socket.stop();

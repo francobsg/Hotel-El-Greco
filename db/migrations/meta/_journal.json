@@ -50,6 +50,34 @@
       "when": 1792030821131,
       "tag": "0006_acceso_exclusivo_servidor",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793693863645,
+      "tag": "0007_thin_sunspot",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793694598214,
+      "tag": "0008_cooing_lady_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793728508526,
+      "tag": "0009_purple_colossus",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793818078324,
+      "tag": "0010_graceful_saracen",
+      "breakpoints": true
     }
   ]
 }
