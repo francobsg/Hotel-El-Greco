@@ -9,12 +9,21 @@ import { leer_filtros_inventario } from "@/lib/inventario/tipos";
 import { obtener_db } from "@/lib/db";
 import type { InicialGuia } from "@/components/guias/FormularioGuia";
 import { ErrorAcceso } from "@/lib/auth/servicio";
+import { z } from "zod";
 export default async function PaginaNuevaGuia({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const usuario = await requirePage("superadmin", "trabajador");
   const parametros = await searchParams;
   const permitido = tipos_guia.find((tipo) => tipo === parametros.tipo && (usuario.rol === "superadmin" || !tipo.startsWith("ajuste_"))) ?? "entrada";
   let inicial: InicialGuia | undefined;
   let aviso: string | null = null;
+  const id_producto = z.coerce.number().int().positive().safeParse(parametros.producto_id);
+  const id_bodega = z.union([z.literal(1), z.literal(2)]).safeParse(Number(parametros.bodega_id));
+  if (permitido === "ajuste_positivo" && id_producto.success && id_bodega.success) {
+    const { filas } = await crear_servicio_inventario(obtener_db()).listar(leer_filtros_inventario({}), true, id_producto.data);
+    const producto = filas[0];
+    if (producto) inicial = { bodega_ajuste: id_bodega.data, items: [{ clave: 1, producto_id: producto.id, producto, cantidad: "", marca: producto.marca ?? "", descripcion: "" }] };
+    else aviso = "No se encontró el producto de la alerta. Selecciónalo manualmente.";
+  }
   if (permitido === "traspaso" && typeof parametros.desde === "string") {
     try {
       const guia = await obtener_guia(parametros.desde, true);

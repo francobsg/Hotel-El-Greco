@@ -1,16 +1,18 @@
 {
   "name": "hotel-museo-el-greco",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
+    "predev": "npm run db:migrate",
     "dev": "next dev",
     "build": "next build",
+    "prestart": "npm run db:migrate",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "predb:seed": "npm run db:migrate",
     "db:seed": "tsx db/seed.ts",
-    "db:local": "tsx scripts/base-local.ts",
     "test": "vitest run",
     "test:e2e": "tsx tests/flujo-auth.e2e.ts"
   },

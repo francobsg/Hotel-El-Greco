@@ -23,7 +23,7 @@ Crear un proyecto Supabase y guardar su contraseña de base de datos. En **Conne
 
 Usar una cuenta PostgreSQL propietaria de las tablas o con BYPASSRLS, solo en el servidor. Las migraciones activan RLS sin políticas para el navegador y revocan acceso de los roles anon/authenticated a las tablas de negocio; la vista de stock respeta RLS. La aplicación utiliza autenticación propia, no Supabase Auth.
 
-En la copia local destinada al despliegue, crear `.env.local` desde `.env.example` y completar las variables. Si se utilizó antes la base embebida, conservar esa configuración por separado y sustituirla por la conexión Supabase de destino. No ejecutar `db:local` para producción.
+En la copia local destinada al despliegue, crear `.env.local` desde `.env.example` y completar las variables. El esquema y las migraciones versionadas están en `db/`; no contienen la base ni almacenan los datos. `DATABASE_URL` debe apuntar a una base PostgreSQL ya creada y accesible.
 
 Generar un secreto de sesión aleatorio:
 
@@ -37,6 +37,8 @@ Copiar el resultado en AUTH_SECRET. Usar una contraseña inicial nueva en SEED_P
 npm ci
 npm run db:migrate
 ```
+
+Las migraciones crean automáticamente las tablas y demás objetos de la aplicación en esa base; no crean el servidor PostgreSQL ni la base inicial. En desarrollo local se aplican antes de `npm run dev` y `npm start`. Para producción en Vercel, `vercel.json` las aplica durante el build. Configura `MIGRATIONS_DATABASE_URL` con una conexión directa o pooler de sesión para migraciones, y `DATABASE_URL` con el pool de transacción para el runtime. Ambas deben apuntar a la misma base y estar disponibles durante el build. Las credenciales de runtime no necesitan permisos para crear bases de datos del servidor.
 
 Para una base vacía de evaluación con datos de ejemplo:
 
@@ -56,12 +58,13 @@ Las fotos manuales y del escáner utilizan el bucket y se sirven mediante rutas 
 
 1. Importar el repositorio desde GitHub.
 2. Seleccionar el preset **Next.js** y Node.js **24 LTS**.
-3. Usar `npm run build` como comando de build. La raíz debe ser la carpeta de `package.json`.
+3. La configuración de [vercel.json](../vercel.json) ejecuta `npm run db:migrate` antes de `npm run build`. La raíz debe ser la carpeta de `package.json`. No se ejecutan migraciones en cada función serverless.
 4. Configurar las variables siguientes en el entorno de Production. Usar valores y bases separados para Preview si se habilita ese entorno.
 
 | Variable | Configuración |
 | --- | --- |
-| DATABASE_URL | URI del pooler de transacción Supabase, copiada desde Connect. |
+| DATABASE_URL | URI del pooler de transacción Supabase, copiada desde Connect; solo para el runtime web. |
+| MIGRATIONS_DATABASE_URL | URI directa o del pooler de sesión Supabase, copiada desde Connect; solo para migraciones durante el build. |
 | DATABASE_POOL_MAX | Pool pequeño por proceso; comenzar con 1–3 según capacidad del proyecto. |
 | AUTH_SECRET | Secreto aleatorio de al menos 32 caracteres. |
 | SUPABASE_URL | URL del proyecto Supabase. |
@@ -89,6 +92,6 @@ Las rutas de OCR y reportes declaran duración máxima de 90 segundos; comprobar
 
 ## Mantenimiento
 
-Conservar y aplicar las migraciones versionadas antes de actualizar el código. Ejecutarlas desde una terminal o CI con conexión directa/sesión, sin mezclarlas con el arranque de cada función web. Mantener copias de seguridad de PostgreSQL y Storage según el entorno elegido.
+Conservar las migraciones versionadas. En Vercel se aplican durante el build mediante `vercel.json`; en desarrollo local, antes de iniciar el servidor. Mantener copias de seguridad de PostgreSQL y Storage según el entorno elegido.
 
 El resumen diario de caja sigue deshabilitado hasta definir su formato y conciliación. La estimación de reposición no modifica stock ni registra compras. El acceso privado entregado para evaluar localmente no es una credencial productiva.

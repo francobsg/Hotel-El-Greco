@@ -15,8 +15,9 @@ function filas_resultado<Fila>(resultado: unknown): Fila[] {
 }
 
 export function crear_servicio_stats<Resultado extends PgQueryResultHKT>(db: PgDatabase<Resultado, typeof esquema>) {
-  async function resumen_panel(input: FiltrosPanel): Promise<ResumenPanel> {
+  async function resumen_panel(input: FiltrosPanel, pagina_alertas = 1): Promise<ResumenPanel> {
     const { fecha, bodega } = filtros_panel.parse(input);
+    if (!Number.isInteger(pagina_alertas) || pagina_alertas < 1) throw new Error("La página de alertas debe ser un entero positivo.");
     const resultado = await db.execute(sql`
       with saldos as (
         select producto_id, bodega_id, sum(cantidad) as cantidad from movimientos
@@ -30,6 +31,16 @@ export function crear_servicio_stats<Resultado extends PgQueryResultHKT>(db: PgD
         from productos p cross join bodegas b
         left join saldos s on s.producto_id = p.id and s.bodega_id = b.id
         where (${bodega}::integer is null or b.id = ${bodega}) and coalesce(s.cantidad, 0) < p.stock_minimo
+          and not exists (
+            select 1 from estado_alertas_stock e where e.producto_id = p.id and e.bodega_id = b.id
+              and e.ignorada_hasta > now()
+          )
+      ), conteo_alertas as (
+        select count(*)::integer as total from alertas
+      ), paginacion_alertas as (
+        select total, greatest(1, ceil(total::numeric / 5)::integer) as paginas,
+          least(${pagina_alertas}, greatest(1, ceil(total::numeric / 5)::integer)) as pagina
+        from conteo_alertas
       )
       select jsonb_build_object(
         'kpis', jsonb_build_object(
@@ -39,9 +50,12 @@ export function crear_servicio_stats<Resultado extends PgQueryResultHKT>(db: PgD
           'movimientos', (select count(*) from movimientos where fecha = ${fecha}::date and (${bodega}::integer is null or bodega_id = ${bodega}))
         ),
         'total_alertas', (select count(*) from alertas),
+        'pagina_alertas', (select pagina from paginacion_alertas),
+        'paginas_alertas', (select paginas from paginacion_alertas),
         'alertas', coalesce((select jsonb_agg(to_jsonb(a) - 'proporcion') from (
           select producto_id, bodega_id, producto, bodega, unidad, cantidad::text, estado, proporcion
-          from alertas order by case when estado = 'critico' then 0 else 1 end, proporcion, producto_id, bodega_id limit 5
+          from alertas order by case when estado = 'critico' then 0 else 1 end, proporcion, producto_id, bodega_id
+          limit 5 offset ((select pagina - 1 from paginacion_alertas) * 5)
         ) a), '[]'::jsonb),
         'movimientos', coalesce((select jsonb_agg(to_jsonb(m)) from (
           select m.id, p.nombre as producto, b.nombre as bodega, g.tipo, m.cantidad::text, p.unidad, m.fecha::text
@@ -116,10 +130,10 @@ export function crear_servicio_stats<Resultado extends PgQueryResultHKT>(db: PgD
   return { resumen_panel, stock_historico, inventario, historial };
 }
 
-export async function obtener_panel(filtros: FiltrosPanel) {
+export async function obtener_panel(filtros: FiltrosPanel, pagina_alertas = 1) {
   await requireRole("superadmin", "admin");
   const servicio = crear_servicio_stats(obtener_db());
-  const [resumen, graficos] = await Promise.all([servicio.resumen_panel(filtros), servicio.stock_historico(filtros)]);
+  const [resumen, graficos] = await Promise.all([servicio.resumen_panel(filtros, pagina_alertas), servicio.stock_historico(filtros)]);
   return { resumen, graficos };
 }
 
